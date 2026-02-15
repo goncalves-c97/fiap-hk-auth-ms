@@ -443,3 +443,6 @@ LoginMs/terraform/.terraform.lock.hcl
 LoginMs/terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/5.100.0/windows_amd64/LICENSE.txt
 LoginMs/terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/5.100.0/windows_amd64/terraform-provider-aws_v5.100.0_x5.exe
 LoginMs/terraform/.terraform/terraform.tfstate
+AuthMs/terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/5.100.0/windows_amd64/LICENSE.txt
+AuthMs/terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/5.100.0/windows_amd64/terraform-provider-aws_v5.100.0_x5.exe
+AuthMs/terraform/.terraform/terraform.tfstate
