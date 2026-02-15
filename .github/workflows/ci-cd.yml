@@ -19,6 +19,7 @@ jobs:
   # TERRAFORM
   # =========================
   terraform:
+    needs: api
     if: vars.TERRAFORM_ENABLED == 'true'
     runs-on: ubuntu-latest
 
@@ -67,6 +68,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -92,12 +95,18 @@ jobs:
 
       - name: Debug OpenCover file
         run: find . -name "coverage.opencover.xml"
-
-        
+      
       - name: End SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            
         run: dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+        
+      - name: SonarCloud Quality Gate Check
+        uses: sonarsource/sonarcloud-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   # =========================
   # DOCKER
