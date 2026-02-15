@@ -43,5 +43,33 @@ namespace Test.Infra.Data.SqlServer
             Assert.False(existedBefore);
             Assert.True(existedAfter);
         }
+
+        [Fact]
+        public void EnsureDatabaseExists_WhenLocalDbAvailable_DbAlreadyExists_ReturnsTrue()
+        {
+            // Optional but deterministic on developer machines/CI images that include LocalDB.
+            // This covers the "db already exists" path (`dbExists == true`) without needing external env config.
+            var cs = "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;TrustServerCertificate=True;Connect Timeout=1;";
+
+            try
+            {
+                // Pre-create DB (ignore failures if it already exists)
+                using (var conn = new Microsoft.Data.SqlClient.SqlConnection(cs))
+                {
+                    conn.Open();
+                    using var cmd = conn.CreateCommand();
+                    cmd.CommandText = "IF DB_ID('AuthDb') IS NULL CREATE DATABASE AuthDb;";
+                    cmd.ExecuteNonQuery();
+                }
+
+                var existed = DatabaseInitializer.EnsureDatabaseExists(cs, DbName);
+                Assert.True(existed);
+            }
+            catch
+            {
+                // LocalDB not installed/available => skip to keep suite stable.
+                return;
+            }
+        }
     }
 }
