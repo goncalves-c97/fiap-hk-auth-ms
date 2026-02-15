@@ -56,6 +56,7 @@ namespace Core.UseCases
 
             return await GenerateClienteToken(secret, cliente);
         }
+
         public static async Task<string> LoginCliente(IClienteGateway clienteGateway, string secret, ClienteDto clienteDto, AuthTypeEnum authTypeEnum)
         {
             if (authTypeEnum == AuthTypeEnum.Email && (string.IsNullOrEmpty(clienteDto.Email) || string.IsNullOrEmpty(clienteDto.Senha)))
