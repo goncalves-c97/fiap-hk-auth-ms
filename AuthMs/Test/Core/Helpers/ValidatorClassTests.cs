@@ -53,10 +53,37 @@ public class ValidatorClassTests
         Assert.DoesNotContain(GenericErrors.IdZeroError.ToString(), v.Errors.Summary);
     }
 
+    [Fact]
+    public void IdValidation_WhenZeroValidated_DoesRegisterIdZeroError()
+    {
+        var v = new ZeroIdNotAllowedValidator { Id = 0 };
+        v.ValidateValueObjectsForTests();
+
+        Assert.False(v.IsValid);
+        Assert.Contains(GenericErrors.IdZeroError.ToString(), v.Errors.Summary);
+    }
+
+    [Fact]
+    public void IdValidation_WhenNegative_DoesRegisterNegativeIdError()
+    {
+        var v = new DummyValidator { Id = -1, Amount = 1, Name = "ok", Token = new byte[] { 1, 2, 3, 4 } };
+
+        v.ValidateValueObjectsForTests();
+
+        Assert.False(v.IsValid);
+        Assert.Contains(GenericErrors.NegativeIdError.ToString(), v.Errors.Summary);
+    }
+
     private sealed class ZeroIdAllowedValidator : ValidatorClass
     {
         public int Id { get; set; }
         protected override void Validate() => IdValidation(Id, nameof(Id), validateZero: false);
+    }
+
+    private sealed class ZeroIdNotAllowedValidator : ValidatorClass
+    {
+        public int Id { get; set; }
+        protected override void Validate() => IdValidation(Id, nameof(Id), validateZero: true);
     }
 
     [Fact]
@@ -68,6 +95,17 @@ public class ValidatorClassTests
         Assert.False(v.IsValid);
         Assert.Contains(GenericErrors.ValueZeroError.ToString(), v.Errors.Summary);
         Assert.True(v.ContainsError(GenericErrors.ValueZeroError, nameof(AmountOnlyValidator.Amount)));
+    }
+
+    [Fact]
+    public void PositiveValueValidation_WhenBellowZero_RegistersValueZeroError()
+    {
+        var v = new AmountOnlyValidator { Amount = -1 };
+        v.ValidateValueObjectsForTests();
+
+        Assert.False(v.IsValid);
+        Assert.Contains(GenericErrors.NegativeValueError.ToString(), v.Errors.Summary);
+        Assert.True(v.ContainsError(GenericErrors.NegativeValueError, nameof(AmountOnlyValidator.Amount)));
     }
 
     private sealed class AmountOnlyValidator : ValidatorClass
@@ -111,6 +149,16 @@ public class ValidatorClassTests
 
         Assert.True(v.IsValid);
         Assert.Empty(v.Errors);
+    }
+
+    [Fact]
+    public void ByteArraySizeValidation_WhenIncorrectSize_DoesRegisterError()
+    {
+        var v = new DummyValidator { Id = 1, Amount = 1, Name = "ok", Token = new byte[] { 1, 2, 3 } };
+        v.ValidateValueObjectsForTests();
+
+        Assert.False(v.IsValid);
+        Assert.NotEmpty(v.Errors);
     }
 
     [Fact]
