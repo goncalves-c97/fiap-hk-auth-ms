@@ -32,6 +32,80 @@ public class ClienteGatewayTests
     }
 
     [Fact]
+    public async Task ExistsByEmail_WhenFound_ReturnsTrue_AndUsesExpectedWhere()
+    {
+        var fake = new FakeDbConnection();
+        string? capturedTable = null;
+        string? capturedWhere = null;
+        object? capturedParams = null;
+
+        fake.SearchFirstOrDefaultHandler = (table, where, param) =>
+        {
+            capturedTable = table;
+            capturedWhere = where;
+            capturedParams = param;
+            return new { Any = "value" };
+        };
+
+        var gw = new ClienteGateway(fake);
+        var exists = await gw.ExistsByEmail("a@a.com");
+
+        Assert.True(exists);
+        Assert.Equal("Cliente", capturedTable);
+        Assert.Equal("email = @Email", capturedWhere);
+        Assert.NotNull(capturedParams);
+    }
+
+    [Fact]
+    public async Task ExistsByEmail_WhenNotFound_ReturnsFalse()
+    {
+        var fake = new FakeDbConnection();
+        fake.SearchFirstOrDefaultHandler = (table, where, param) => null;
+
+        var gw = new ClienteGateway(fake);
+        var exists = await gw.ExistsByEmail("a@a.com");
+
+        Assert.False(exists);
+    }
+
+    [Fact]
+    public async Task ExistsByUsuario_WhenFound_ReturnsTrue_AndUsesExpectedWhere()
+    {
+        var fake = new FakeDbConnection();
+        string? capturedTable = null;
+        string? capturedWhere = null;
+        object? capturedParams = null;
+
+        fake.SearchFirstOrDefaultHandler = (table, where, param) =>
+        {
+            capturedTable = table;
+            capturedWhere = where;
+            capturedParams = param;
+            return new { Any = "value" };
+        };
+
+        var gw = new ClienteGateway(fake);
+        var exists = await gw.ExistsByUsuario("N");
+
+        Assert.True(exists);
+        Assert.Equal("Cliente", capturedTable);
+        Assert.Equal("usuario = @Usuario", capturedWhere);
+        Assert.NotNull(capturedParams);
+    }
+
+    [Fact]
+    public async Task ExistsByUsuario_WhenNotFound_ReturnsFalse()
+    {
+        var fake = new FakeDbConnection();
+        fake.SearchFirstOrDefaultHandler = (table, where, param) => null;
+
+        var gw = new ClienteGateway(fake);
+        var exists = await gw.ExistsByUsuario("N");
+
+        Assert.False(exists);
+    }
+
+    [Fact]
     public async Task DeleteAll_DeletesWith1Eq1()
     {
         var fake = new FakeDbConnection();
