@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using Core.Dtos;
 using Core.Enums;
-using Core.Helpers;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -75,5 +74,40 @@ public class AutenticacaoEndpointTests
         var tokenValue = ok.Value?.GetType().GetProperty("Token")?.GetValue(ok.Value) as string;
         Assert.False(string.IsNullOrWhiteSpace(tokenValue));
         _ = new JwtSecurityTokenHandler().ReadJwtToken(tokenValue);
+    }
+
+    [Fact]
+    public async Task LoginCliente_WhenClienteNotFound_ReturnsUnauthorized()
+    {
+        var db = new FakeDbConnection();
+        db.SearchFirstOrDefaultHandler = (table, where, param) => null; // simulate not found
+
+        var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            { "API_AUTHENTICATION_KEY", Secret }
+        }).Build();
+
+        var endpoint = new AutenticacaoEndpoint(db, config);
+
+        var result = await endpoint.LoginCliente(new ClienteDto { Email = "e@e.com", Senha = "1234" }, AuthTypeEnum.Email);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task LoginCliente_WhenMissingRequiredFields_ReturnsBadRequest()
+    {
+        var db = new FakeDbConnection();
+        var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            { "API_AUTHENTICATION_KEY", Secret }
+        }).Build();
+
+        var endpoint = new AutenticacaoEndpoint(db, config);
+
+        var result = await endpoint.LoginCliente(new ClienteDto { Email = "e@e.com", Senha = "" }, AuthTypeEnum.Email);
+
+        var bad = Assert.IsType<BadRequestObjectResult>(result);
+        Assert.NotNull(bad.Value);
     }
 }
