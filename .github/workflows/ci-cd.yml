@@ -104,6 +104,8 @@ jobs:
         
       - name: SonarCloud Quality Gate Check
         uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
+        with:
+          scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
