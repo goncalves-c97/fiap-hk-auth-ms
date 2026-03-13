@@ -49,7 +49,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Fast Food Challenge API - Login microservice (V1.0)",
+        Title = "Hackaton - API - Autenticação (V1.0)",
         Version = "v1",
         Contact = new OpenApiContact
         {
@@ -138,6 +138,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

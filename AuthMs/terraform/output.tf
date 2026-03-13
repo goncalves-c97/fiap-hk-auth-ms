@@ -1,14 +1,34 @@
-# Exporta o endpoint do banco de dados após a criação
+output "service_url" {
+  description = "URL publica do microsservico de autenticacao."
+  value       = data.terraform_remote_state.infra.outputs.auth_url
+}
+
+output "ecs_cluster_name" {
+  description = "Cluster ECS compartilhado."
+  value       = data.terraform_remote_state.infra.outputs.ecs_cluster_name
+}
+
+output "ecs_service_name" {
+  description = "Nome do servico ECS de autenticacao."
+  value       = data.terraform_remote_state.infra.outputs.ecs_service_names.auth
+}
+
 output "db_endpoint" {
-  description = "O endpoint da instância do banco de dados RDS."
-  value       = aws_db_instance.sqlserver_login_ms.address
+  description = "Endpoint do banco SQL Server usado pela autenticacao."
+  value       = data.terraform_remote_state.infra.outputs.database_endpoints.auth
 }
 
-output "private_subnet_ids" {
-  value = data.aws_subnets.private_subnets.ids
+output "db_secret_arn" {
+  description = "ARN do secret com DB_CONNECTION_STRING e DB_NAME."
+  value       = data.terraform_remote_state.infra.outputs.database_secret_arns.auth
 }
 
-output "rds_security_group_id" {
-  description = "The ID of the security group for the RDS instance."
-  value       = data.terraform_remote_state.network.outputs.rds_security_group_id
+output "shared_secret_arn" {
+  description = "ARN do secret compartilhado com API_AUTHENTICATION_KEY."
+  value       = data.terraform_remote_state.infra.outputs.shared_secret_arn
+}
+
+output "container_image" {
+  description = "Imagem Docker Hub configurada para o auth-ms."
+  value       = data.terraform_remote_state.infra.outputs.dockerhub_images.auth
 }
